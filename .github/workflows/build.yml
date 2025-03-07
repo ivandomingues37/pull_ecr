@@ -32,7 +32,7 @@ jobs:
       - name: Construir e enviar a imagem Docker
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_TAG: site_andersen-v1
         run: |
           docker build -t $ECR_REGISTRY/ivan-teste:$IMAGE_TAG .
           docker push $ECR_REGISTRY/ivan-teste:$IMAGE_TAG
