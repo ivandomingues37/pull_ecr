@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: new-app
+  labels:
+    app: new-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: new-app
+  template:
+    metadata:
+      labels:
+        app: new-app
+    spec:
+      containers:
+      - name: new-app
+        image: ivandomingues/ivan-teste:v${VERSION} # Substitua com a imagem do seu repositório
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: new-app-service
+spec:
+  selector:
+    app: new-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: NodePort

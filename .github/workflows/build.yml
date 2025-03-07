@@ -21,9 +21,9 @@ jobs:
       - name: Configurar credenciais AWS
         uses: aws-actions/configure-aws-credentials@v3
         with:
-          role-to-assume: arn:aws:iam::ACCOUNT_ID:role/NOME_DA_ROLE
+          role-to-assume: arn:aws:iam::308033146551:role/role_poc_ecr
           role-session-name: GitHubActions
-          aws-region: us-east-1
+          aws-region: us-east-2
 
       - name: Login no Amazon ECR
         id: login-ecr
@@ -34,5 +34,5 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t $ECR_REGISTRY/REPO_NAME:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/REPO_NAME:$IMAGE_TAG
+          docker build -t $ECR_REGISTRY/ivan-teste:$IMAGE_TAG teste_site_web/Dockefile
+          docker push $ECR_REGISTRY/ivan-teste:$IMAGE_TAG
