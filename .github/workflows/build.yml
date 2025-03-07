@@ -7,7 +7,7 @@ on:
 
 permissions:
   id-token: write  # Permite que o GitHub Actions gere um token OIDC
-  contents: read   # Permissão para ler o código do repositório
+  contents: write   # Permissão para ler o código do repositório
 
 jobs:
   deploy:
