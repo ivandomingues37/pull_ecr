@@ -1,0 +1,38 @@
+name: Deploy to Amazon ECR
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write  # Permite que o GitHub Actions gere um token OIDC
+  contents: read   # Permissão para ler o código do repositório
+
+jobs:
+  deploy:
+    name: Push to ECR
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar credenciais AWS
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: arn:aws:iam::ACCOUNT_ID:role/NOME_DA_ROLE
+          role-session-name: GitHubActions
+          aws-region: us-east-1
+
+      - name: Login no Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Construir e enviar a imagem Docker
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/REPO_NAME:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/REPO_NAME:$IMAGE_TAG
