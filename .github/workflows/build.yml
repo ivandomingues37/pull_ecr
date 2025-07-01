@@ -21,7 +21,7 @@ jobs:
       - name: Configurar credenciais AWS
         uses: aws-actions/configure-aws-credentials@v3
         with:
-          role-to-assume: arn:aws:iam::308033146551:role/role_poc_ecr
+          role-to-assume: arn:aws:iam::870205216049:role/role_poc_ecr
           role-session-name: GitHubActions
           aws-region: us-east-2
 
