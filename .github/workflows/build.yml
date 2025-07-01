@@ -43,7 +43,8 @@ jobs:
         run: |
           # VERSAO=${{ env.version }}
           # export VERSION=$VERSAO 
-          envsubst < novo-pod.tpl.yaml > kubernetes/novo-pod.yaml
+          #envsubst < novo-pod.tpl.yaml > kubernetes/novo-pod.yaml
+          envsubst '${IMAGE_TAG}' < novo-pod.tpl.yaml > pull_ecr/kubernetes/novo-pod.yaml
           cat kubernetes/novo-pod.yaml
       
       - uses: stefanzweifel/git-auto-commit-action@v5
