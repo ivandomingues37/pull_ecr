@@ -1,34 +1,17 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: networking.k8s.io/v1
+kind: Ingress
 metadata:
-  name: new-app
-  labels:
-    app: new-app
+  name: new-app-ingress
+  annotations:
+    kubernetes.io/ingress.class: "kong"
 spec:
-  replicas: 4
-  selector:
-    matchLabels:
-      app: new-app
-  template:
-    metadata:
-      labels:
-        app: new-app
-    spec:
-      containers:
-      - name: new-app
-        image: 870205216049.dkr.ecr.us-east-2.amazonaws.com/ivan-teste:site_andersen-v25 # Substitua com a imagem do seu repositório.
-        ports:
-        - containerPort: 80
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: new-app-service
-spec:
-  selector:
-    app: new-app
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
-  type: NodePort
+  rules:
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: new-app-service
+            port:
+              number: 80
