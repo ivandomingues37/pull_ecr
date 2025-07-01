@@ -38,6 +38,8 @@ jobs:
           docker push $ECR_REGISTRY/ivan-teste:$IMAGE_TAG
 
       - name : Write new version in deployment
+        env:
+          IMAGE_TAG: site_andersen-v${{ github.run_number }}
         run: |
           # VERSAO=${{ env.version }}
           # export VERSION=$VERSAO 
