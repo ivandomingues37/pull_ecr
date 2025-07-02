@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: konga
+  namespace: konga
+spec:
+  type: LoadBalancer  # Ou ClusterIP se quiser usar ingress/port-forward
+  ports:
+  - port: 1337
+    targetPort: 1337
+    protocol: TCP
+  selector:
+    app: konga
+
