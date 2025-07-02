@@ -16,37 +16,19 @@ spec:
     spec:
       containers:
       - name: new-app
-        image: 870205216049.dkr.ecr.us-east-2.amazonaws.com/ivan-teste:site_andersen-v25 # Substitua com a imagem do seu repositório.
+        image: 870205216049.dkr.ecr.us-east-2.amazonaws.com/ivan-teste:site_andersen-v31 # Substitua com a imagem do seu repositório.
         ports:
         - containerPort: 80
-# ---
-# apiVersion: v1
-# kind: Service
-# metadata:
-#   name: new-app-service
-# spec:
-#   selector:
-#     app: new-app
-#   ports:
-#     - protocol: TCP
-#       port: 80
-#       targetPort: 80
-#   type: NodePort
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: v1
+kind: Service
 metadata:
-  name: new-app-ingress
-  annotations:
-    kubernetes.io/ingress.class: "kong"
+  name: new-app-service
 spec:
-  rules:
-  - http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: new-app-service
-            port:
-              number: 80
+  selector:
+    app: new-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: NodePort
