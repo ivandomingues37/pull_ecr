@@ -47,7 +47,7 @@ jobs:
 
       - name: Configurar kubectl para GKE
         run: |
-          gcloud container clusters get-credentials cluster-gke --zone us-east1-b --project kubernetes-464719
+          gcloud container clusters get-credentials k8s --zone us-east1-b --project kubernetes-464719
 
       - name: Deploy no GKE (atualizar imagem do deployment)
         env:
