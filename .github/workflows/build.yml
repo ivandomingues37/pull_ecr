@@ -45,13 +45,13 @@ jobs:
         run: |
           docker push $REPOSITORY:$IMAGE_TAG
 
-      - name: Configurar kubectl para GKE
-        run: |
-          gcloud container clusters get-credentials k8s --zone us-east1-b --project kubernetes-464719
+      # - name: Configurar kubectl para GKE
+      #   run: |
+      #     gcloud container clusters get-credentials k8s --zone us-east1-b --project kubernetes-464719
 
-      - name: Deploy no GKE (atualizar imagem do deployment)
-        env:
-          IMAGE_TAG: ${{ github.sha }}
-          REPOSITORY: us-east1-docker.pkg.dev/kubernetes-464719/pocgke/teste
-        run: |
-          kubectl set image deployment/seu-deployment seu-container=$REPOSITORY:$IMAGE_TAG
+      # - name: Deploy no GKE (atualizar imagem do deployment)
+      #   env:
+      #     IMAGE_TAG: ${{ github.sha }}
+      #     REPOSITORY: us-east1-docker.pkg.dev/kubernetes-464719/pocgke/teste
+      #   run: |
+      #     kubectl set image deployment/seu-deployment seu-container=$REPOSITORY:$IMAGE_TAG
