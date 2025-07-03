@@ -6,12 +6,11 @@ on:
       - gke
 
 permissions:
-  id-token: write        # Necessário para autenticação OIDC no GCP
-  contents: read         # Para checkout do código
+  id-token: write
+  contents: read
 
 jobs:
   build-deploy:
-    name: Build and Deploy
     runs-on: ubuntu-latest
 
     steps:
@@ -30,28 +29,28 @@ jobs:
       - name: Build da imagem Docker
         env:
           IMAGE_TAG: ${{ github.sha }}
-          REPOSITORY: us-east1-docker.pkg.dev/kubernetes-464719/pocgke/kubernetes-464719/pull_ecr/teste
+          REPOSITORY: us-east1-docker.pkg.dev/kubernetes-464719/pocgke/teste
         run: |
           docker build -t $REPOSITORY:$IMAGE_TAG .
-      
+
       - name: Autenticar Docker no Artifact Registry
         run: |
-          gcloud auth configure-docker REGION-docker.pkg.dev
-      
+          gcloud auth configure-docker us-east1-docker.pkg.dev
+
       - name: Push da imagem para Artifact Registry
         env:
           IMAGE_TAG: ${{ github.sha }}
-          REPOSITORY: REGION-docker.pkg.dev/PROJECT_ID/REPOSITORY_NAME/IMAGE_NAME
+          REPOSITORY: us-east1-docker.pkg.dev/kubernetes-464719/pocgke/teste
         run: |
           docker push $REPOSITORY:$IMAGE_TAG
 
       - name: Configurar kubectl para GKE
         run: |
-          gcloud container clusters get-credentials CLUSTER_NAME --zone CLUSTER_ZONE --project PROJECT_ID
+          gcloud container clusters get-credentials cluster-gke --zone us-east1-b --project kubernetes-464719
 
       - name: Deploy no GKE (atualizar imagem do deployment)
         env:
           IMAGE_TAG: ${{ github.sha }}
-          REPOSITORY: REGION-docker.pkg.dev/PROJECT_ID/REPOSITORY_NAME/IMAGE_NAME
+          REPOSITORY: us-east1-docker.pkg.dev/kubernetes-464719/pocgke/teste
         run: |
-          kubectl set image deployment/NOME_DEPLOY NOME_CONTAINER=$REPOSITORY:$IMAGE_TAG
+          kubectl set image deployment/seu-deployment seu-container=$REPOSITORY:$IMAGE_TAG
