@@ -1,4 +1,4 @@
-name: Deploy to Amazon ECR
+name: Build and Deploy to GKE
 
 on:
   push:
@@ -6,47 +6,52 @@ on:
       - main
 
 permissions:
-  id-token: write  # Permite que o GitHub Actions gere um token OIDC
-  contents: write   # Permissão para ler o código do repositório
+  id-token: write        # Necessário para autenticação OIDC no GCP
+  contents: read         # Para checkout do código
 
 jobs:
-  deploy:
-    name: Push to ECR
+  build-deploy:
+    name: Build and Deploy
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
 
-      - name: Configurar credenciais AWS
-        uses: aws-actions/configure-aws-credentials@v3
+      - name: Autenticar com Google Cloud
+        uses: google-github-actions/auth@v2
         with:
-          role-to-assume: arn:aws:iam::870205216049:role/role_poc_ecr
-          role-session-name: GitHubActions
-          aws-region: us-east-2
+          workload_identity_provider: 'projects/152888038826/locations/global/workloadIdentityPools/github-pool-v3/providers/github-provider'
+          service_account: 'github-ci@kubernetes-464719.iam.gserviceaccount.com'
 
-      - name: Login no Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
+      - name: Configurar gcloud
+        uses: google-github-actions/setup-gcloud@v2
 
-      - name: Construir e enviar a imagem Docker
+      - name: Build da imagem Docker
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: site_andersen-v${{ github.run_number }}
+          IMAGE_TAG: ${{ github.sha }}
+          REPOSITORY: us-east1-docker.pkg.dev/kubernetes-464719/pocgke/kubernetes-464719/pull_ecr/teste
         run: |
-          docker build -t $ECR_REGISTRY/ivan-teste:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/ivan-teste:$IMAGE_TAG
-
-      - name : Write new version in deployment
-        env:
-          IMAGE_TAG: site_andersen-v${{ github.run_number }}
-        run: |
-          # VERSAO=${{ env.version }}
-          # export VERSION=$VERSAO 
-          #envsubst < novo-pod.tpl.yaml > kubernetes/novo-pod.yaml
-          envsubst '${IMAGE_TAG}' < novo-pod.tpl.yaml > kubernetes/novo-pod.yaml
-          cat kubernetes/novo-pod.yaml
+          docker build -t $REPOSITORY:$IMAGE_TAG .
       
-      - uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "Pipe codou fofamente por versão!"
+      - name: Autenticar Docker no Artifact Registry
+        run: |
+          gcloud auth configure-docker REGION-docker.pkg.dev
+      
+      - name: Push da imagem para Artifact Registry
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+          REPOSITORY: REGION-docker.pkg.dev/PROJECT_ID/REPOSITORY_NAME/IMAGE_NAME
+        run: |
+          docker push $REPOSITORY:$IMAGE_TAG
+
+      - name: Configurar kubectl para GKE
+        run: |
+          gcloud container clusters get-credentials CLUSTER_NAME --zone CLUSTER_ZONE --project PROJECT_ID
+
+      - name: Deploy no GKE (atualizar imagem do deployment)
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+          REPOSITORY: REGION-docker.pkg.dev/PROJECT_ID/REPOSITORY_NAME/IMAGE_NAME
+        run: |
+          kubectl set image deployment/NOME_DEPLOY NOME_CONTAINER=$REPOSITORY:$IMAGE_TAG
