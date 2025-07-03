@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: new-app
-        image: 870205216049.dkr.ecr.us-east-2.amazonaws.com/ivan-teste:site_andersen-v31 # Substitua com a imagem do seu repositório.
+        image: us-east1-docker.pkg.dev/kubernetes-464719/pocgke/teste # Substitua com a imagem do seu repositório.
         ports:
         - containerPort: 80
 ---
