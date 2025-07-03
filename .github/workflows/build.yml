@@ -26,6 +26,12 @@ jobs:
 
       - name: Configurar gcloud
         uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: kubernetes-464719
+          export_default_credentials: true
+
+      - name: Instalar gke-gcloud-auth-plugin
+        run: sudo apt-get update && sudo apt-get install -y google-cloud-cli-gke-gcloud-auth-plugin
 
       - name: Build da imagem Docker
         env:
@@ -49,9 +55,12 @@ jobs:
         run: |
           gcloud container clusters get-credentials k8s --zone us-east1-b --project kubernetes-464719
 
-      - name: Deploy no GKE (atualizar imagem do deployment)
+      - name: Atualizar imagem no manifesto e aplicar deployment
         env:
           IMAGE_TAG: ${{ github.sha }}
           REPOSITORY: us-east1-docker.pkg.dev/kubernetes-464719/pocgke/teste
         run: |
-          kubectl set image deployment/seu-deployment seu-container=$REPOSITORY:$IMAGE_TAG
+          # Substitui a imagem no arquivo YAML do deployment
+          sed -i "s|image: .*|image: $REPOSITORY:$IMAGE_TAG|g" kubernetes/seu-deployment.yaml
+          # Aplica o manifesto atualizado no cluster
+          kubectl apply -f kubernetes/seu-deployment.yaml
