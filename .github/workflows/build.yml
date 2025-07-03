@@ -3,7 +3,7 @@ name: Build and Deploy to GKE
 on:
   push:
     branches:
-      - main
+      - gke
 
 permissions:
   id-token: write        # Necessário para autenticação OIDC no GCP
