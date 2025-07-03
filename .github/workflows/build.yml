@@ -21,7 +21,7 @@ jobs:
         uses: google-github-actions/auth@v2
         with:
           token_format: access_token
-          workload_identity_provider: 'projects/152888038826/locations/global/workloadIdentityPools/github-pool-v3/providers/github-provider'
+          workload_identity_provider: 'projects/152888038826/locations/global/workloadIdentityPools/github-pool-v3/providers/github-provider-v2'
           service_account: 'github-ci@kubernetes-464719.iam.gserviceaccount.com'
 
       - name: Configurar gcloud
