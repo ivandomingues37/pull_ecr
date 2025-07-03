@@ -26,12 +26,6 @@ jobs:
 
       - name: Configurar gcloud
         uses: google-github-actions/setup-gcloud@v2
-        with:
-          project_id: kubernetes-464719
-          export_default_credentials: true
-
-      - name: Instalar gke-gcloud-auth-plugin
-        run: sudo apt-get update && sudo apt-get install -y google-cloud-cli-gke-gcloud-auth-plugin
 
       - name: Build da imagem Docker
         env:
@@ -53,7 +47,7 @@ jobs:
 
       - name: Configurar kubectl para GKE
         run: |
-          gcloud container clusters get-credentials k8s --zone us-east1-b --project kubernetes-464719A
+          gcloud container clusters get-credentials k8s --zone us-east1-b --project kubernetes-464719
 
       - name: Deploy no GKE (atualizar imagem do deployment)
         env:
