@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-consumer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka-consumer
+  template:
+    metadata:
+      labels:
+        app: kafka-consumer
+    spec:
+      containers:
+        - name: kafka-consumer
+          image: emr001/kafka-consumer:v1
+          env:
+            - name: KAFKA_BROKERS
+              value: "kafka.default.svc.cluster.local:9092"
+            - name: KAFKA_TOPIC
+              value: "example-topic"

@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-producer-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka-producer-api
+  template:
+    metadata:
+      labels:
+        app: kafka-producer-api
+    spec:
+      containers:
+        - name: kafka-producer-api
+          image: emr001/kafka-producer-api:v1
+          ports:
+            - containerPort: 3000
+          env:
+            - name: KAFKA_BROKERS
+              value: "kafka.default:9092"
+            - name: KAFKA_TOPIC
+              value: "example-topic"
