@@ -1,52 +1,45 @@
-name: Deploy to Amazon ECR
+name: Deploy ECS
 
 on:
   push:
     branches:
-      - main
-
-permissions:
-  id-token: write  # Permite que o GitHub Actions gere um token OIDC
-  contents: write   # Permissão para ler o código do repositório
+      - ecs
 
 jobs:
-  deploy:
-    name: Push to ECR
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout do código
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Configurar credenciais AWS
-        uses: aws-actions/configure-aws-credentials@v3
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
         with:
-          role-to-assume: arn:aws:iam::870205216049:role/role_poc_ecr
-          role-session-name: GitHubActions
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
 
-      - name: Login no Amazon ECR
+      - name: Login to ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Construir e enviar a imagem Docker
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: site_andersen-v${{ github.run_number }}
+      - name: Build Docker image
         run: |
-          docker build -t $ECR_REGISTRY/ivan-teste:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/ivan-teste:$IMAGE_TAG
+          IMAGE_TAG=${{ github.sha }}
+          docker build -t 870205216049.dkr.ecr.us-east-2.amazonaws.com/ivan-teste:$IMAGE_TAG .
+          docker tag 870205216049.dkr.ecr.us-east-2.amazonaws.com/ivan-teste:$IMAGE_TAG ${{ steps.login-ecr.outputs.registry }}/my-ecr-repo:$IMAGE_TAG
 
-      - name : Write new version in deployment
-        env:
-          IMAGE_TAG: site_andersen-v${{ github.run_number }}
+      - name: Push Docker image to ECR
         run: |
-          # VERSAO=${{ env.version }}
-          # export VERSION=$VERSAO 
-          #envsubst < novo-pod.tpl.yaml > kubernetes/novo-pod.yaml
-          envsubst '${IMAGE_TAG}' < novo-pod.tpl.yaml > kubernetes/novo-pod.yaml
-          cat kubernetes/novo-pod.yaml
-      
-      - uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "Pipe codou fofamente por versão!"
+          IMAGE_TAG=${{ github.sha }}
+          docker push ${{ steps.login-ecr.outputs.registry }}/my-ecr-repo:$IMAGE_TAG
+
+      - name: Update ECS Service
+        run: |
+          IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/my-ecr-repo:${{ github.sha }}
+          aws ecs update-service \
+            --cluster my-ecs-cluster \
+            --service my-ecs-service \
+            --force-new-deployment \
+            --image $IMAGE_URI
