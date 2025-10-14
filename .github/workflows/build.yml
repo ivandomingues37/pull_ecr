@@ -9,8 +9,8 @@ env:
   ECR_REPO: 870205216049.dkr.ecr.us-east-2.amazonaws.com/ivan-teste
   IMAGE_TAG: latest
   CLUSTER_NAME: my-ecs-cluster
-  SERVICE_NAME: ivan-teste-service
-  TASK_DEFINITION_FAMILY: ivan-teste-task
+  SERVICE_NAME: nginx-test-task-service-kf3k1j19
+  TASK_DEFINITION_FAMILY: nginx-test-task
 
 jobs:
   build-and-deploy:
