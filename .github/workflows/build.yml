@@ -20,12 +20,15 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v4
 
+      - name: Instalar dependências
+        run: sudo apt-get update && sudo apt-get install -y jq
+
       - name: Configurar credenciais AWS
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }} # se estiver usando SSO
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Login no Amazon ECR
@@ -55,11 +58,16 @@ jobs:
           
           echo "$NEW_TASK_DEF" > new-task-def.json
 
-          aws ecs register-task-definition --cli-input-json file://new-task-def.json
+          NEW_TASK_INFO=$(aws ecs register-task-definition --cli-input-json file://new-task-def.json)
+          NEW_TASK_ARN=$(echo "$NEW_TASK_INFO" | jq -r '.taskDefinition.taskDefinitionArn')
+
+          echo "NEW_TASK_ARN=$NEW_TASK_ARN" >> $GITHUB_ENV
+          echo "✅ Nova Task Definition registrada: $NEW_TASK_ARN"
 
       - name: Atualizar o serviço ECS
         run: |
           aws ecs update-service \
             --cluster $CLUSTER_NAME \
             --service $SERVICE_NAME \
+            --task-definition $NEW_TASK_ARN \
             --force-new-deployment
