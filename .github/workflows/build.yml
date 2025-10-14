@@ -39,6 +39,3 @@ jobs:
         run: |
           docker push $ECR_REPO:$IMAGE_TAG
           docker push "$ECR_REPO:${{ github.sha }}"
-
-      - name: Exibir imagem enviada
-        run: echo "Imagem enviada: $ECR_REPO:${{ github.sha }}"
