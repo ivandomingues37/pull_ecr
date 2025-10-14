@@ -1,4 +1,4 @@
-name: Build and Push Docker image to ECR
+name: Build, Push and Deploy to ECS
 
 on:
   push:
@@ -8,9 +8,12 @@ env:
   AWS_REGION: us-east-2
   ECR_REPO: 870205216049.dkr.ecr.us-east-2.amazonaws.com/ivan-teste
   IMAGE_TAG: latest
+  CLUSTER_NAME: my-ecs-cluster
+  SERVICE_NAME: ivan-teste-service
+  TASK_DEFINITION_FAMILY: ivan-teste-task
 
 jobs:
-  build-and-push:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -39,3 +42,24 @@ jobs:
         run: |
           docker push $ECR_REPO:$IMAGE_TAG
           docker push "$ECR_REPO:${{ github.sha }}"
+
+      - name: Atualizar Task Definition
+        run: |
+          TASK_DEF=$(aws ecs describe-task-definition \
+            --task-definition $TASK_DEFINITION_FAMILY)
+
+          NEW_TASK_DEF=$(echo "$TASK_DEF" | jq --arg IMAGE "$ECR_REPO:${{ github.sha }}" \
+            '.taskDefinition | .containerDefinitions[0].image=$IMAGE | 
+             del(.taskDefinitionArn, .revision, .status, .requiresAttributes, 
+                 .compatibilities, .registeredAt, .registeredBy)')
+          
+          echo "$NEW_TASK_DEF" > new-task-def.json
+
+          aws ecs register-task-definition --cli-input-json file://new-task-def.json
+
+      - name: Atualizar o serviço ECS
+        run: |
+          aws ecs update-service \
+            --cluster $CLUSTER_NAME \
+            --service $SERVICE_NAME \
+            --force-new-deployment
