@@ -1,45 +1,45 @@
-name: Deploy ECS
+name: Build and Push Docker image to ECR
 
 on:
   push:
-    branches:
-      - ecs
+    branches: [ecs] # ou o branch que quiser usar
+
+env:
+  AWS_REGION: us-east-2                    # ajuste para sua região
+  ECR_REPO: 870205216049.dkr.ecr.us-east-2.amazonaws.com/ivan-teste
+  IMAGE_TAG: latest                        # pode usar latest ou gerar dinâmico com o commit SHA
 
 jobs:
-  build-and-deploy:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Checkout do código
+        uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+      - name: Configurar credenciais AWS
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::870205216049:role/role_poc_ecr
-          role-session-name: GitHubActions
-          aws-region: us-east-2
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }} # necessário se usar SSO
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Login no Amazon ECR
         id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Build Docker image
         run: |
-          IMAGE_TAG=${{ github.sha }}
-          docker build -t 870205216049.dkr.ecr.us-east-2.amazonaws.com/ivan-teste:$IMAGE_TAG .
-          docker tag 870205216049.dkr.ecr.us-east-2.amazonaws.com/ivan-teste:$IMAGE_TAG ${{ steps.login-ecr.outputs.registry }}/my-ecr-repo:$IMAGE_TAG
+          aws ecr get-login-password --region $AWS_REGION | \
+          docker login --username AWS --password-stdin $ECR_REPO
 
-      - name: Push Docker image to ECR
+      - name: Build da imagem Docker
         run: |
-          IMAGE_TAG=${{ github.sha }}
-          docker push ${{ steps.login-ecr.outputs.registry }}/my-ecr-repo:$IMAGE_TAG
+          docker build -t $ECR_REPO:$IMAGE_TAG .
+          docker tag $ECR_REPO:$IMAGE_TAG $ECR_REPO:${{ github.sha }}
 
-      - name: Update ECS Service
+      - name: Push da imagem para o ECR
         run: |
-          IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/my-ecr-repo:${{ github.sha }}
-          aws ecs update-service \
-            --cluster my-ecs-cluster \
-            --service my-ecs-service \
-            --force-new-deployment \
-            --image $IMAGE_URI
+          docker push $ECR_REPO:$IMAGE_TAG
+          docker push $ECR_REPO:${{ github.sha }}
+
+      - name: Exibir imagem enviada
+        run: echo "Imagem enviada: $ECR_REPO:${{ github.sha }}"
