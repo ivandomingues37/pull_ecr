@@ -6,14 +6,38 @@
     <title>Andersen Folião</title>
     <style>
         body {
-            background: linear-gradient(45deg, #ff007f, #ffbf00, #00ffbf, #bf00ff);
-            background-size: 400% 400%;
-            animation: backgroundAnimation 10s infinite alternate;
             font-family: Arial, sans-serif;
             text-align: center;
             color: white;
             margin: 0;
             padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* Vídeo de fundo */
+        #background-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -2;
+        }
+
+        /* Gradiente animado por cima do vídeo */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #ff007f, #ffbf00, #00ffbf, #bf00ff);
+            background-size: 400% 400%;
+            animation: backgroundAnimation 10s infinite alternate;
+            opacity: 0.6; /* ajusta intensidade do gradiente sobre o vídeo */
+            z-index: -1;
         }
 
         @keyframes backgroundAnimation {
@@ -37,12 +61,11 @@
             position: absolute;
             width: 10px;
             height: 10px;
-            background: yellow;
             opacity: 0.8;
             animation: fall 5s linear infinite;
         }
 
-            @keyframes fall {
+        @keyframes fall {
             from { transform: translateY(-100vh) rotate(0deg); }
             to { transform: translateY(100vh) rotate(360deg); }
         }
@@ -67,6 +90,12 @@
     </style>
 </head>
 <body>
+
+    <!-- Vídeo de fundo -->
+    <video autoplay muted loop id="background-video">
+        <source src="videos/carnaval.mp4" type="video/mp4">
+        Seu navegador não suporta vídeos HTML5.
+    </video>
 
     <h1>Andersen Folião até em ECS🎭🎉</h1>
     <div class="container">
