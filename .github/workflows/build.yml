@@ -2,12 +2,12 @@ name: Build and Push Docker image to ECR
 
 on:
   push:
-    branches: [ecs] # ou o branch que quiser usar
+    branches: [ecs]
 
 env:
-  AWS_REGION: us-east-2                    # ajuste para sua região
+  AWS_REGION: us-east-2
   ECR_REPO: 870205216049.dkr.ecr.us-east-2.amazonaws.com/ivan-teste
-  IMAGE_TAG: latest                        # pode usar latest ou gerar dinâmico com o commit SHA
+  IMAGE_TAG: latest
 
 jobs:
   build-and-push:
@@ -22,11 +22,10 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }} # necessário se usar SSO
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }} # se estiver usando SSO
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Login no Amazon ECR
-        id: login-ecr
         run: |
           aws ecr get-login-password --region $AWS_REGION | \
           docker login --username AWS --password-stdin $ECR_REPO
@@ -34,12 +33,12 @@ jobs:
       - name: Build da imagem Docker
         run: |
           docker build -t $ECR_REPO:$IMAGE_TAG .
-          docker tag $ECR_REPO:$IMAGE_TAG $ECR_REPO:${{ github.sha }}
+          docker tag $ECR_REPO:$IMAGE_TAG "$ECR_REPO:${{ github.sha }}"
 
       - name: Push da imagem para o ECR
         run: |
           docker push $ECR_REPO:$IMAGE_TAG
-          docker push $ECR_REPO:${{ github.sha }}
+          docker push "$ECR_REPO:${{ github.sha }}"
 
       - name: Exibir imagem enviada
         run: echo "Imagem enviada: $ECR_REPO:${{ github.sha }}"
