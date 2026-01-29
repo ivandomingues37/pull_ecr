@@ -33,7 +33,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           # Ajuste o nome do repositório para incluir o prefixo esperado
-          ECR_REPOSITORY: ivan-teste/site_andersen-v${{ github.run_number }}
+          ECR_REPOSITORY: ivan-teste
         run: |
           # 1. Build diretamente como latest (já que o repo tem a versão no nome)
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
