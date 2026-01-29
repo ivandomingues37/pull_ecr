@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: minha-app
+  name: site-technium
   namespace: technium
 spec:
   replicas: 1
