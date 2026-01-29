@@ -19,6 +19,6 @@ spec:
             - containerPort: 3000
           env:
             - name: KAFKA_BROKERS
-              value: "kafka.default:9092"
+              value: "kafka-release-controller-0.kafka-release-controller-headless.default.svc.cluster.local:9092"
             - name: KAFKA_TOPIC
               value: "example-topic"

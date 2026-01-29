@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Andersen Folião</title>
+    <style>
+        body {
+            background: linear-gradient(45deg, #ff007f, #ffbf00, #00ffbf, #bf00ff);
+            background-size: 400% 400%;
+            animation: backgroundAnimation 10s infinite alternate;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
+
+        @keyframes backgroundAnimation {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
+        }
+
+        h1 {
+            font-size: 60px;
+            text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
+            margin-top: 50px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: yellow;
+            opacity: 0.8;
+            animation: fall 5s linear infinite;
+        }
+
+        @keyframes fall {
+            from { transform: translateY(-100vh) rotate(0deg); }
+            to { transform: translateY(100vh) rotate(360deg); }
+        }
+
+        .btn {
+            background: #ff007f;
+            border: none;
+            padding: 15px 30px;
+            font-size: 20px;
+            color: white;
+            cursor: pointer;
+            margin-top: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background: #ffbf00;
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Andersen Folião 🎭🎉</h1>
+    <div class="container">
+        <p>Bem-vindo à festa mais animada do ano! Entre na folia e aproveite o Carnaval com muita alegria, cores e diversão!!! 🥳</p>
+        <button class="btn" onclick="soltarConfetes()">Soltar Confetes 🎊</button>
+    </div>
+
+    <script>
+        function soltarConfetes() {
+            for (let i = 0; i < 100; i++) {
+                let confetti = document.createElement("div");
+                confetti.classList.add("confetti");
+                confetti.style.left = Math.random() * 100 + "vw";
+                confetti.style.top = -Math.random() * 100 + "px";
+                confetti.style.background = ["red", "yellow", "blue", "green", "purple", "pink"][Math.floor(Math.random() * 6)];
+                confetti.style.animationDuration = Math.random() * 3 + 2 + "s";
+                document.body.appendChild(confetti);
+
+                setTimeout(() => {
+                    confetti.remove();
+                }, 5000);
+            }
+        }
+    </script>
+
+</body>
+</html>

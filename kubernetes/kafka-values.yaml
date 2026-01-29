@@ -1,0 +1,16 @@
+controller:
+  replicaCount: 3
+  persistence:
+    enabled: true
+    storageClass: "gp2"   # Define explicitamente a StorageClass
+    size: 10Gi            # Ou outro tamanho conforme necessário
+  podAntiAffinityPreset: soft
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: topology.kubernetes.io/zone
+                operator: In
+                values:
+                  - us-east-2a

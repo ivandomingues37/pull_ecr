@@ -1,0 +1,11 @@
+yamlApplicationConfig:
+  kafka:
+    clusters:
+      - name: kafka-teste
+        bootstrap.servers: kafka-release-controller-0.kafka-release-controller-headless.default.svc.cluster.local:9092
+  auth:
+    type: disabled
+  management:
+    health:
+      ldap:
+        enabled: false

@@ -17,6 +17,6 @@ spec:
           image: emr001/kafka-consumer:v1
           env:
             - name: KAFKA_BROKERS
-              value: "kafka.default.svc.cluster.local:9092"
+              value: "kafka-release.default.svc.cluster.local:9092"
             - name: KAFKA_TOPIC
               value: "example-topic"
