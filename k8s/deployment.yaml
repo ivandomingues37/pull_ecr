@@ -17,9 +17,6 @@ spec:
         - name: ecr-secret
       containers:
       - name: minha-app
-        # Usamos a variável que a sua pipeline preenche via envsubst
-        image: 870205216049.dkr.ecr.us-east-2.amazonaws.com/ivan-teste:${IMAGE_TAG}
-        # Garante que o K8s sempre baixe a imagem nova mesmo que a tag seja repetida
-        imagePullPolicy: Always
+        image: 870205216049.dkr.ecr.us-east-2.amazonaws.com/ivan-teste:latest
         ports:
         - containerPort: 80
