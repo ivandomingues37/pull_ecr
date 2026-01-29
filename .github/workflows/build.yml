@@ -32,10 +32,14 @@ jobs:
       - name: Construir e enviar a imagem Docker
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: site_andersen-v${{ github.run_number }}
+          # Ajuste o nome do repositório para incluir o prefixo esperado
+          ECR_REPOSITORY: ivan-teste/site_andersen-v${{ github.run_number }}
         run: |
-          docker build -t $ECR_REGISTRY/ivan-teste:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/ivan-teste:$IMAGE_TAG
+          # 1. Build diretamente como latest (já que o repo tem a versão no nome)
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+          
+          # 2. Push da imagem
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
       - name : Write new version in deployment
         env:
