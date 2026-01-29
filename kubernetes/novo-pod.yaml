@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: new-app
-        image: 870205216049.dkr.ecr.us-east-2.amazonaws.com/ivan-teste:site_andersen-v82 # Substitua com a imagem do seu repositório.
+        image: 870205216049.dkr.ecr.us-east-2.amazonaws.com/ivan-teste:site_andersen-v83 # Substitua com a imagem do seu repositório.
         ports:
         - containerPort: 80
 ---
