@@ -19,4 +19,4 @@ spec:
       - name: minha-app
         image: 870205216049.dkr.ecr.us-east-2.amazonaws.com/ivan-teste:site_andersen-v74
         ports:
-        - containerPort: 8080
+        - containerPort: 80
